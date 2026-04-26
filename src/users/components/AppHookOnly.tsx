@@ -1,17 +1,12 @@
 //import { UsersHookOnly } from "./users/components/UsersHookOnly";  <UsersHookOnly />
 //import { Users } from "./users/components/Users"; <Users />
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import {  z } from "zod";
-
-const schema = z.object({
-  email: z.email(),
-  password: z.string().min(8),
-});
-type FormFileds = z.infer<typeof schema>;
-
-export function App() {
+type FormFileds = {
+  email: string;
+  password: string;
+};
+export function AppHookOnly() {
   const {
     register,
     handleSubmit,
@@ -22,7 +17,6 @@ export function App() {
       email: "test",
       password: "test",
     },
-    resolver: zodResolver(schema),
   });
   const onSubmit = async (data: FormFileds) => {
     try {
@@ -43,9 +37,23 @@ export function App() {
         gap: "10px",
       }}
     >
-      <input {...register("email")} type="text" placeholder="Email" />
+      <input
+        {...register("email", {
+          required: { value: true, message: "Email is required" },
+          validate: (val) => val.includes("@") || "not an email",
+        })}
+        type="text"
+        placeholder="Email"
+      />
       {errors.email && <div> {errors.email.message}</div>}
-      <input {...register("password")} type="password" placeholder="Password" />
+      <input
+        {...register("password", {
+          required: "Password is required",
+          minLength: { value: 8, message: "must have 8 letters" },
+        })}
+        type="text"
+        placeholder="Password"
+      />
       {errors.password && <div> {errors.password.message}</div>}
       <button disabled={isSubmitting} type="submit">
         {isSubmitting ? "loading" : "submit"}
